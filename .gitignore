@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules
 /.pnp
 .pnp.js
 
@@ -34,3 +34,44 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+logs/
+
+# Package files
+*.jar
+*.war
+*.ear
+
+# Spring Boot
+boot-info/
+build-image-temp-layer/
+
+# Build directories
+target/
+build/
+
+# IDE specific files
+.idea/
+.project
+.classpath
+.settings/
+.vscode/
+*.iml
+*.iws
+
+# OS generated files
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Configurações com senhas (evite commitá-los)
+application-secret.properties
+application-secret.yml
