@@ -1,0 +1,27 @@
+# Build e Dependências locais
+target/
+*.jar
+*.war
+*.ear
+
+# Ferramentas de Desenvolvimento e IDEs
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+.classpath
+.project
+.settings/
+.nbproject/
+build/
+
+# Sistema Operacional
+.DS_Store
+Thumbs.db
+
+# Logs e Dados temporários
+*.log
+.elasticbeanstalk/

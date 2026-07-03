@@ -11,7 +11,7 @@ Sistema para gerenciamento de grupos e membros.
 | Node.js         | 22     |
 | React           | 19     |
 | Java            | 21     |
-| Springboot      | 4.0    |
+| Springboot      | 4.1    |
 | Package Manager | pnpm   |
 
 ---
@@ -71,62 +71,40 @@ pnpm run preview
 
 ## Backend
 
-```bash
-```
+## 🛠️ Tecnologias e Configurações
 
-```bash
-cd api
-```
+- **Linguagem:** Java 21
+- **Framework Principal:** Spring Boot 4.1.0
+- **Gerenciador de Dependências:** Maven
+- **Empacotamento:** Jar
+- **Configuração de Ambiente:** application.properties
 
-Instale as dependências:
+## 📦 Dependências Incluídas
 
-```bash
-```
----
+- **Spring Web:** Estrutura para criação de endpoints RESTful e aplicações web MVC utilizando o servidor embarcado Apache Tomcat.
+- **Spring Security:** Mecanismo robusto e customizável para autenticação, autorização e controle de acesso aos recursos da API.
+- **Spring Boot Actuator:** Ferramenta operacional que expõe endpoints prontos para monitoramento de saúde (*health check*), métricas e sessões da aplicação.
+- **Lombok:** Biblioteca de anotações que reduz drasticamente o código boilerplate (geração automática de getters, setters, construtores, etc.).
+- **Spring Boot DevTools:** Ferramentas de desenvolvimento que ativam reinicializações rápidas do servidor (*LiveReload*) e otimizações em tempo de código.
 
-# ▶️ Executando o Projeto
+### Passos para Execução
 
-## Frontend
+1. **Clonar o repositório:**
+   ```bash
+   cd api
+   ```
 
-Inicie o ambiente de desenvolvimento:
+2. **Compilar o projeto:**
+   ```bash
+   ./mvnw clean install
+   ```
 
-```bash
-pnpm dev
-```
+3. **Executar a aplicação:**
+   ```bash
+   ./mvnw spring-boot:run
+   ```
 
-Build de produção:
-
-```bash
-pnpm build
-```
-
-Executar em produção:
-
-```bash
-pnpm start
-```
-
----
-
-## Backend
-
-Modo desenvolvimento:
-
-```bash
-pnpm start:dev
-```
-
-Build:
-
-```bash
-pnpm build
-```
-
-Modo produção:
-
-```bash
-pnpm start:prod
-```
+A API estará disponível por padrão no endereço: `http://localhost:8080`.
 
 ---
 
