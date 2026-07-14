@@ -13,7 +13,6 @@ export default function AddParticipante({
     const novoParticipante: ParticipanteInterface = {
       id: Date.now(),
       nome: "Novo Participante",
-      isAdmin: false,
     };
 
     onSave(novoParticipante);

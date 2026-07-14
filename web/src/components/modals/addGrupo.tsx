@@ -19,6 +19,7 @@ export default function AddGrupo({ onSave, onClose }: AddGrupoProps) {
     const novoUsuario: GrupoInterface = {
       id: Date.now(),
       nome: "Novo Grupo",
+      parentId: Date.now() + 1,
     };
 
     onSave(novoUsuario);

@@ -10,8 +10,8 @@ export default function AddSubgrupo({ onSave, onClose }: AddSubgrupoProps) {
   function salvar() {
     const novoSubgrupo: GrupoInterface = {
       id: Date.now(),
-
       nome: "Novo Subgrupo",
+      parentId: Date.now() + 1,
     };
 
     onSave(novoSubgrupo);
