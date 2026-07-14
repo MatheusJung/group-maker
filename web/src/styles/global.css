@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  /* Adicionando cores */
+  --color-primary: #007de3;
+  --color-primary-accent: #005fbc;
+  --color-primary-light: #00c2ff;
+  --color-secondary: #fe8c68;
+  --color-background: white;
+
+  /* Customizando fontes */
+  --font-display: "Poppins", sans-serif;
+  --color-text-primary: white;
+  --color-text-secondary: black;
+
+  --color-surface-dark: #111827;
+  --color-surface-gray: #9ca3af;
+  --color-surface-light: #f3f4fc;
+}
+
+/* Estilos de reset base usando as variáveis que você criou acima */
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text-secondary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+}
