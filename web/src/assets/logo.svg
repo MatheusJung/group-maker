@@ -1,0 +1,12 @@
+<svg viewBox="0 0 560 160" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .txt { font-family: 'Arial Rounded MT Bold', 'Helvetica Rounded', Arial, sans-serif; font-weight: 800; }
+    </style>
+  </defs>
+
+  <!-- wordmark -->
+  <text x="20" y="105" class="txt" font-size="72">
+    <tspan fill="#FF8A5C">+</tspan><tspan fill="#1E88F0">Group</tspan><tspan fill="#FF8A5C">Maker</tspan>
+  </text>
+</svg>
