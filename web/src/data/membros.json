@@ -1,0 +1,20 @@
+[
+  { "participanteId": 1, "grupoId": 1, "isAdmin": false },
+  { "participanteId": 1, "grupoId": 2, "isAdmin": true },
+
+  { "participanteId": 2, "grupoId": 1, "isAdmin": false },
+  { "participanteId": 2, "grupoId": 2, "isAdmin": false },
+
+  { "participanteId": 3, "grupoId": 1, "isAdmin": false },
+  { "participanteId": 3, "grupoId": 2, "isAdmin": false },
+
+  { "participanteId": 4, "grupoId": 1, "isAdmin": false },
+  { "participanteId": 4, "grupoId": 3, "isAdmin": true },
+
+  { "participanteId": 5, "grupoId": 1, "isAdmin": false },
+  { "participanteId": 5, "grupoId": 3, "isAdmin": false },
+
+  { "participanteId": 6, "grupoId": 1, "isAdmin": false },
+  { "participanteId": 7, "grupoId": 1, "isAdmin": false },
+  { "participanteId": 8, "grupoId": 1, "isAdmin": false }
+]

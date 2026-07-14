@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "nome": "Peter P.",
+    "foto": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/620-spider-man.jpg"
+  },
+  {
+    "id": 2,
+    "nome": "Gwen S.",
+    "foto": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/619-spider-gwen.jpg"
+  },
+  {
+    "id": 3,
+    "nome": "Felicia H.",
+    "foto": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/99-black-cat.jpg"
+  },
+  {
+    "id": 4,
+    "nome": "Aleksei M.",
+    "foto": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/556-rhino.jpg"
+  },
+  {
+    "id": 5,
+    "nome": "Quentin B.",
+    "foto": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/479-mysterio.jpg"
+  },
+  {
+    "id": 6,
+    "nome": "William B.",
+    "foto": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/572-sandman.jpg"
+  },
+  { "id": 7, "nome": "Carol Danvers" },
+  {
+    "id": 8,
+    "nome": "Norman O.",
+    "foto": "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/images/lg/299-green-goblin.jpg"
+  }
+]
