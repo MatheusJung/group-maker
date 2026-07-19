@@ -6,9 +6,7 @@ import type {
   ModalType,
   GrupoInterface,
   ParticipanteInterface,
-  UsuarioInterface,
 } from "../../types/type";
-import AddUsuario from "./addUsuario";
 
 interface ModalProps {
   onClose: () => void;
@@ -16,15 +14,15 @@ interface ModalProps {
   onAdicionarGrupo?: (grupo: GrupoInterface) => void;
   onAdicionarSubgrupo?: (subgrupo: GrupoInterface) => void;
   onAdicionarParticipante?: (participante: ParticipanteInterface) => void;
-  onAdicionarUsuario?: (usuario: UsuarioInterface) => void;
 }
 
 export const modalTitles: Record<Exclude<ModalType, null>, string> = {
   participante: "Novo Participante",
   grupo: "Novo Grupo",
   subgrupo: "Novo Subgrupo",
-  usuario: "Cadastro de usuário",
-  login: "Login",
+  foto: "Atualizar foto",
+  perfil: "Atualizar perfil",
+  apagar: "Apagar conta",
 };
 
 export function obterComponenteModal(tipo: ModalType, props: ModalProps) {
@@ -55,13 +53,6 @@ export function obterComponenteModal(tipo: ModalType, props: ModalProps) {
           onSave={props.onAdicionarSubgrupo}
           onClose={props.onClose}
         />
-      );
-    case "usuario":
-      if (!props.onAdicionarUsuario) {
-        return null;
-      }
-      return (
-        <AddUsuario onSave={props.onAdicionarUsuario} onClose={props.onClose} />
       );
     default:
       return null;
