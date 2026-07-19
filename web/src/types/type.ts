@@ -28,6 +28,7 @@ export type ModalType =
   | "participante"
   | "grupo"
   | "subgrupo"
-  | "usuario"
-  | "login"
+  | "foto"
+  | "perfil"
+  | "apagar"
   | null;
