@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import type { TokenResponse } from '../types/auth';
 
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export const apiPublica: AxiosInstance = axios.create({
   baseURL: BASE_URL,
