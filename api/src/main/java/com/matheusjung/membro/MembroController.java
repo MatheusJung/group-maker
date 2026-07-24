@@ -3,10 +3,12 @@ package com.matheusjung.membro;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.matheusjung.membro.dto.request.AtualizarMembroRequest;
 import com.matheusjung.membro.dto.response.MembroResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -23,15 +25,21 @@ public class MembroController {
     private final MembroService service;
 
     @GetMapping
-    @Operation(summary = "Listar membros")
-    public List<MembroResponse> findAll() {
-        return service.listar();
+    @Operation(summary = "Listar todos os membros")
+    public ResponseEntity<List<MembroResponse>> listarMembros() {
+        return ResponseEntity.ok(service.listar());
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Consultar membro")
-    public MembroResponse findById(@PathVariable UUID id) {
-        return service.buscarPorId(id);
+    @Operation(summary = "Consultar membro pelo ID do membro")
+    public ResponseEntity<MembroResponse> buscarPorId(@PathVariable UUID id) {
+        return ResponseEntity.ok(service.buscarPorId(id));
+    }
+
+    @GetMapping("/me")
+    @Operation(summary = "Consultar o membro do usuário logado")
+    public ResponseEntity<MembroResponse> buscarMeuMembro(@AuthenticationPrincipal UUID usuarioId) {
+        return ResponseEntity.ok(service.buscarMeuMembro(usuarioId));
     }
 
     @PutMapping(value = "/atualizaPerfil")

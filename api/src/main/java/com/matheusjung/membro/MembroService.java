@@ -116,16 +116,18 @@ public class MembroService {
     }
 
     private Usuario getUsuarioLogado() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    
-    if (authentication == null || !authentication.isAuthenticated()) {
-        throw AuthException.naoAutenticado();
-    }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-    String usernameLogado = authentication.getName();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw AuthException.naoAutenticado();
+        }
 
-    return usuarioRepository.findByNome(usernameLogado)
-            .orElseThrow(() -> new RuntimeException("Usuário logado não encontrado no banco de dados."));
+        if (!(authentication.getPrincipal() instanceof UUID usuarioId)) {
+            throw AuthException.naoAutenticado();
+        }
+
+        return usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuário logado não encontrado no banco de dados."));
     }
 
     public Membro getMembroLogado() {
@@ -139,23 +141,26 @@ public class MembroService {
               .orElseThrow(MembroException::naoEncontrado);
     }
 
+    public MembroResponse buscarMeuMembro(UUID usuarioId) {
+        Membro membro = buscarMembroPorUsuarioId(usuarioId);
+
+        return mapper.toResponse(membro);
+    }
+
     // Métodos auxiliares
     public Membro buscarMembro(UUID id) {
-
         return membroRepository.findById(id)
                 .orElseThrow(MembroException::naoEncontrado);
     }
 
     public Usuario buscarUsuario(UUID id) {
-
         return usuarioRepository.findById(id)
                 .orElseThrow(MembroException::naoEncontrado);
     }
 
     public Usuario buscarUsuarioPorNome(String nome) {
-
-    return usuarioRepository.findByNome(nome)
-               .orElseThrow(MembroException::naoEncontrado);
+        return usuarioRepository.findByNome(nome)
+                .orElseThrow(MembroException::naoEncontrado);
     }
 
     public Membro buscarMembroPorUsuarioId(UUID usuarioId) {
