@@ -6,5 +6,6 @@ public record GrupoResponse(
     UUID id,
     String nome,
     String descricao,
+    String fotoUrl,
     UUID grupoPaiId
 ){}
