@@ -19,5 +19,6 @@ public interface GrupoMembroMapper {
 
     @Mapping(target = "grupoId", source = "grupo.id")
     @Mapping(target = "membroId", source = "membro.id")
+    @Mapping(target = "isAdmin", source = "admin")
     GrupoMembroResponse toResponse(GrupoMembro membro);
 } 

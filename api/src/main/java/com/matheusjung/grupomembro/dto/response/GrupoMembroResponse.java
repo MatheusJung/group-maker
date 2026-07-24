@@ -4,5 +4,6 @@ import java.util.UUID;
 
 public record GrupoMembroResponse(
         UUID grupoId,
-        UUID membroId
+        UUID membroId,
+        Boolean isAdmin
 ) {}
