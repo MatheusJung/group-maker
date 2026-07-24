@@ -29,7 +29,8 @@ public class JwtFilter extends OncePerRequestFilter {
         return "OPTIONS".equalsIgnoreCase(method) || 
                path.contains("/auth/refresh") || 
                path.contains("/auth/login") || 
-               path.contains("/auth/cadastro");
+               path.contains("/auth/cadastro") ||
+               path.contains("/auth/logout");
     }
 
     @Override

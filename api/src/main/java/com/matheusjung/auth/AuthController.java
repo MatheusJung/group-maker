@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.matheusjung.auth.dto.AuthTokens;
@@ -24,10 +23,11 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @Tag(name = "Auth", description = "Endpoints para Cadastro, Login, Refresh Token e Logout")
@@ -36,6 +36,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final RefreshTokenService refreshTokenService;
+    private static final String REFRESH_TOKEN_KEY = "refreshToken";
 
     @PostMapping("/cadastro")
     @Operation(summary = "Criar um novo cadastro")
@@ -55,7 +56,7 @@ public class AuthController {
         
         AuthTokens tokens = authService.login(request);
         
-        ResponseCookie springCookie = ResponseCookie.from("refreshToken", tokens.refreshToken().toString())
+        ResponseCookie springCookie = ResponseCookie.from(REFRESH_TOKEN_KEY, tokens.refreshToken().toString())
             .httpOnly(true)
             .secure(true)    // false para funcionar localmente em HTTP (sem HTTPS)
             .path("/")
@@ -68,9 +69,7 @@ public class AuthController {
         return ResponseEntity.ok(
             new TokenResponse(
                 tokens.accessToken(),
-                tokens.nome(),
-                tokens.nomeUsuario(), 
-                tokens.fotoUrl()
+                tokens.usuarioId()
             )
         );
     }
@@ -86,7 +85,7 @@ public class AuthController {
         // Captura o cookie sem deixar o Spring MVC quebrar
         if (request.getCookies() != null) {
             for (Cookie c : request.getCookies()) {
-                if ("refreshToken".equals(c.getName())) {
+                if (REFRESH_TOKEN_KEY.equals(c.getName())) {
                     refreshTokenStr = c.getValue();
                     break;
                 }
@@ -102,7 +101,7 @@ public class AuthController {
             AuthTokens novoParDeTokens = authService.refresh(tokenUuid);
 
             // Emite o novo cookie utilizando o builder moderno do Spring
-            ResponseCookie springCookie = ResponseCookie.from("refreshToken", novoParDeTokens.refreshToken().toString())
+            ResponseCookie springCookie = ResponseCookie.from(REFRESH_TOKEN_KEY, novoParDeTokens.refreshToken().toString())
                     .httpOnly(true)
                     .secure(true) // false:testes locais em HTTP
                     .path("/")     // Escopo global
@@ -114,9 +113,7 @@ public class AuthController {
 
             return ResponseEntity.ok(new TokenResponse(
                 novoParDeTokens.accessToken(),
-                novoParDeTokens.nome(),
-                novoParDeTokens.nomeUsuario(),
-                novoParDeTokens.fotoUrl()
+                novoParDeTokens.usuarioId()
             ));
 
         } catch (Exception e) {
@@ -124,7 +121,6 @@ public class AuthController {
         }
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Realizar logout de usuario")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
@@ -136,7 +132,7 @@ public class AuthController {
         // Leitura segura de cookie no Logout para evitar erros do Spring MVC
         if (request.getCookies() != null) {
             for (Cookie c : request.getCookies()) {
-                if ("refreshToken".equals(c.getName())) {
+                if (REFRESH_TOKEN_KEY.equals(c.getName())) {
                     refreshTokenStr = c.getValue();
                     break;
                 }
@@ -148,11 +144,12 @@ public class AuthController {
                 UUID tokenUuid = UUID.fromString(refreshTokenStr);
                 refreshTokenService.revogar(tokenUuid);
             } catch (Exception e) {
-                // Ignora falhas de parse no logout para garantir a limpeza do cookie
+                log.warn("Falha ao processar refresh token: {}", e.getMessage());
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
         }
 
-        ResponseCookie limpaCookie = ResponseCookie.from("refreshToken", "")
+        ResponseCookie limpaCookie = ResponseCookie.from(REFRESH_TOKEN_KEY, "")
                 .httpOnly(true)
                 .secure(true)
                 .path("/")

@@ -61,17 +61,13 @@ public class AuthService{
             throw LoginException.invalida();
         }
 
-        Membro membro = membroService.buscarMembroPorUsuarioId(usuario.getId());
-
-        String accessToken = jwtService.gerar(usuario.getNome());
+        String accessToken = jwtService.gerar(usuario.getNome(), usuario.getId());
         RefreshToken refreshToken = refreshTokenService.gerar(usuario);
 
         return new AuthTokens(
                 accessToken,
                 refreshToken.getId(),
-                membro.getNome(),
-                usuario.getNome(),
-                membro.getFotoUrl()
+                usuario.getId()
         );
     }
 
@@ -80,18 +76,14 @@ public class AuthService{
 
         RefreshToken refreshToken = refreshTokenService.atualizar(tokenVindoDoCookie);
         Usuario usuario = refreshToken.getUsuario();
-        Membro membro = membroService.buscarMembroPorUsuarioId(usuario.getId());
-        String accessToken = jwtService.gerar(usuario.getNome());
+        String accessToken = jwtService.gerar(usuario.getNome(), usuario.getId());
 
         return new AuthTokens(
                 accessToken,
-                refreshToken.getId(),
-                membro.getNome(),
-                usuario.getNome(),
-                membro.getFotoUrl()
+                usuario.getId(),
+                refreshToken.getId()
         );
     }
-
 
     @Transactional
     public void logout(LogoutRequest request) {

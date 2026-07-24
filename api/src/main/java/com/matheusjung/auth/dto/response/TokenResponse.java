@@ -1,8 +1,8 @@
 package com.matheusjung.auth.dto.response;
 
+import java.util.UUID;
+
 public record TokenResponse (
     String accessToken,
-    String nome,
-    String nomeUsuario,
-    String fotoUrl
+    UUID usuarioId
 ) {}
