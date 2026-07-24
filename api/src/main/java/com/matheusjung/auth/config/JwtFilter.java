@@ -13,19 +13,18 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.matheusjung.auth.service.JwtService;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
 
-    // Ignora a verificação se a requisição for de preflight (CORS) do navegador
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        // Pula o filtro se for OPTIONS ou se for a rota de refresh/login/cadastro
         return "OPTIONS".equalsIgnoreCase(method) || 
                path.contains("/auth/refresh") || 
                path.contains("/auth/login") || 
@@ -43,11 +42,11 @@ public class JwtFilter extends OncePerRequestFilter {
             String token = authHeader.substring(7);
             
             try {
-                String username = jwtService.extrairNomeUsuario(token); 
+                UUID usuarioId = jwtService.extrairUsuarioId(token);
 
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                if (usuarioId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                            username, null, Collections.emptyList()
+                            usuarioId, null, Collections.emptyList()
                     );
                     
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -55,7 +54,6 @@ public class JwtFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (Exception e) {
-                // Token inválido ou expirado - limpa o contexto por segurança
                 SecurityContextHolder.clearContext();
             }
         }
