@@ -16,6 +16,7 @@ import com.matheusjung.membro.MembroService;
 import com.matheusjung.membro.model.Membro;
 import com.matheusjung.shared.storage.ImageStorageService;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -37,8 +38,14 @@ public class GrupoService {
     public GrupoResponse criarGrupo(CriarGrupoRequest request) {
 
         Grupo grupo = mapper.toEntity(request);
-        repository.save(grupo);
 
+        if (request.grupoPaiId() != null) {
+            Grupo grupoPai = repository.findById(request.grupoPaiId())
+                .orElseThrow(() -> new EntityNotFoundException("Grupo pai não encontrado"));
+            grupo.setGrupoPai(grupoPai);
+        }
+
+        repository.save(grupo);
         grupoMembroService.criadorComoAdmin(grupo);
 
         return mapper.toResponse(grupo);
