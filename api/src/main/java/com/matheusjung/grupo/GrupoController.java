@@ -37,9 +37,9 @@ public class GrupoController {
         return service.buscarPorId(id);
     }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     @Operation(summary = "Criar Grupo")
-    public ResponseEntity<GrupoResponse> criarGrupo(@Valid CriarGrupoRequest request) {
+    public ResponseEntity<GrupoResponse> criarGrupo(@RequestBody @Valid  CriarGrupoRequest request) {
 
     GrupoResponse response = service.criarGrupo(request);
 
@@ -62,14 +62,12 @@ public class GrupoController {
                 .body(response);
     }
 
-    @PutMapping(
-        value = "/{id}",
-        consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
+    @PutMapping("/{id}")
     @Operation(summary = "Atualizar Grupo")
     public ResponseEntity<GrupoResponse> atualizarGrupo(
-            @PathVariable UUID id,@Valid AtualizarGrupoRequest request) {
-
+        @PathVariable UUID id,
+        @RequestBody @Valid AtualizarGrupoRequest request) 
+    {
         GrupoResponse response = service.atualizarGrupo(id, request);
 
         return ResponseEntity.ok(response);
