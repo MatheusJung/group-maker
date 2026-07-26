@@ -1,34 +1,25 @@
 export interface GrupoInterface {
-  id: number;
+  id: string;
   nome: string;
   descricao?: string;
-  maxParticipantes?: number;
-  parentId: number | null;
+  //maxMembros?: number;
+  fotoUrl: string;
+  grupoPaiId: string | null;
 }
-
 export interface ParticipanteInterface {
-  id: number;
+  id: string;
   nome: string;
-  foto?: string;
+  fotoUrl?: string;
 }
-
 export interface MembroInterface {
-  participanteId: number;
-  grupoId: number;
+  participanteId: string;
+  grupoId: string;
   isAdmin: boolean;
+  nomeMembro: string;
+  fotoMembro: string | null;
 }
-
 export interface UsuarioInterface {
-  id: number;
+  id: string;
   nomeUsuario: string;
   senha: string;
 }
-
-export type ModalType =
-  | "participante"
-  | "grupo"
-  | "subgrupo"
-  | "foto"
-  | "perfil"
-  | "apagar"
-  | null;

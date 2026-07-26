@@ -16,7 +16,5 @@ export interface LoginRequest {
 
 export interface TokenResponse {
   accessToken: string;
-  nome: string;
-  nomeUsuario: string;
-  fotoUrl?: string;
+  usuarioId: string;
 }

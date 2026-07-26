@@ -12,4 +12,7 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
+    build: {
+    sourcemap: false 
+  }
 })

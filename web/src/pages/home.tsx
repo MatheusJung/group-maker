@@ -1,86 +1,98 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Footer from "../components/layout/footer";
 import Grupos from "../components/grupos";
-import Header from "../components/layout/header";
-import Modal from "../components/modals/modal";
+import Header from "../components/layout/header/header";
+import EntrarPorConvite from "../components/modals/EntrarPorConvite";
 import {
-  modalTitles,
-  obterComponenteModal,
-} from "../components/modals/modalConfig";
-import { adicionarMembro } from "../utils/grupoUtils";
-import gruposData from "../data/grupos.json";
-import participantesData from "../data/participantes.json";
-import membrosData from "../data/membros.json";
+  ModalWrapper,
+  type ModalType,
+} from "../components/modals/ModalWrapper";
 import type {
   GrupoInterface,
   ParticipanteInterface,
   MembroInterface,
-  ModalType,
 } from "../types/type";
+import { grupoService } from "../services/grupoService";
+import { ParticipanteAtualProvider } from "../contexts/ParticipanteAtualContext";
 
 export default function Home() {
-  const [grupos, setGrupos] = useState<GrupoInterface[]>(gruposData);
-  const [participantes, setParticipantes] =
-    useState<ParticipanteInterface[]>(participantesData);
-  const [membros, setMembros] = useState<MembroInterface[]>(membrosData);
-
+  const [grupos, setGrupos] = useState<GrupoInterface[]>([]);
+  const [participantes, setParticipantes] = useState<ParticipanteInterface[]>(
+    [],
+  );
+  const [membros, setMembros] = useState<MembroInterface[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erroCarregamento, setErroCarregamento] = useState<string | null>(null);
   const [modalType, setModalType] = useState<ModalType>(null);
-  const modalEstaAberto = modalType !== null;
-  const abrirModal = (tipo: Exclude<ModalType, null>) => setModalType(tipo);
   const fecharModal = () => setModalType(null);
 
-  function adicionarGrupo(parentId: number | null = null): void {
-    const novoGrupo: GrupoInterface = {
-      id: Date.now(),
-      nome: `Grupo ${grupos.length + 1}`,
-      parentId,
-    };
-    setGrupos((prev) => [...prev, novoGrupo]);
-  }
+  const carregarDados = useCallback(async () => {
+    try {
+      const dados = await grupoService.carregarDadosIniciais();
+      setGrupos(dados.grupos);
+      setParticipantes(dados.participantes);
+      setMembros(dados.membros);
+      setErroCarregamento(null);
+    } catch {
+      setErroCarregamento("Não foi possível carregar os dados.");
+    } finally {
+      setCarregando(false);
+    }
+  }, []);
 
-  function adicionarParticipanteAoGrupo(grupoId: number): void {
-    const novoParticipante: ParticipanteInterface = {
-      id: Date.now(),
-      nome: `Participante ${participantes.length + 1}`,
-    };
-    setParticipantes((prev) => [...prev, novoParticipante]);
-    setMembros((prev) =>
-      adicionarMembro(novoParticipante.id, grupoId, prev, grupos),
-    );
-  }
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    carregarDados();
+  }, [carregarDados]);
 
-  const gruposRaiz = grupos.filter((g) => g.parentId === null);
+  const gruposRaiz = grupos.filter((g) => g.grupoPaiId === null);
 
   return (
-    <>
+    <ParticipanteAtualProvider>
       <div className="flex flex-col min-h-screen">
         <Header />
 
         <div className="flex-1 p-4 ml-10 mr-10">
-          <Grupos
-            grupos={gruposRaiz}
-            todosGrupos={grupos}
-            todosParticipantes={participantes}
-            membros={membros}
-            onAdicionarSubgrupo={adicionarGrupo}
-            onAdicionarParticipante={adicionarParticipanteAoGrupo}
-            onAbrirModalAdicionar={() => abrirModal("grupo")}
-          />
+          {carregando && <p className="text-secondary">Carregando grupos...</p>}
+          {erroCarregamento && (
+            <p className="text-red-600">{erroCarregamento}</p>
+          )}
 
-          <Modal
-            isOpen={modalEstaAberto}
-            title={modalType ? modalTitles[modalType] : ""}
-            onClose={fecharModal}
-          >
-            {obterComponenteModal(modalType, {
-              onClose: fecharModal,
-              onAdicionarGrupo: () => adicionarGrupo(null),
-            })}
-          </Modal>
+          {!carregando && !erroCarregamento && (
+            <>
+              <div className="flex justify-end mb-2">
+                <button
+                  onClick={() => setModalType("entrarPorConvite")}
+                  className="text-sm rounded px-3 py-1 bg-primary-accent text-text-primary hover:bg-primary"
+                >
+                  Entrar por convite
+                </button>
+              </div>
+
+              <Grupos
+                grupoPai={null}
+                grupos={gruposRaiz}
+                todosGrupos={grupos}
+                todosParticipantes={participantes}
+                membros={membros}
+                permiteAdicionar
+                onChange={carregarDados}
+              />
+
+              <ModalWrapper tipo={modalType} onClose={fecharModal}>
+                {modalType === "entrarPorConvite" && (
+                  <EntrarPorConvite
+                    onClose={fecharModal}
+                    onEntrou={carregarDados}
+                  />
+                )}
+              </ModalWrapper>
+            </>
+          )}
         </div>
 
         <Footer />
       </div>
-    </>
+    </ParticipanteAtualProvider>
   );
 }

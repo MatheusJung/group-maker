@@ -4,7 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 import { authService } from "../services/authService";
 import { validacoes } from "../utils/validacoes";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import type { TokenResponse } from "../types/auth";
 
 export default function Login() {
@@ -14,10 +14,8 @@ export default function Login() {
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async () => {
     setErro("");
-
     if (!validacoes.validarUsuario(usuario)) {
       setErro("O usuário inserido é inválido. Use apenas letras e números.");
       return;
@@ -31,9 +29,7 @@ export default function Login() {
       console.log("Login efetuado com sucesso!");
 
       loginContexto({
-        nome: respostaApi.nome,
-        nomeUsuario: respostaApi.nomeUsuario,
-        fotoUrl: respostaApi.fotoUrl,
+        usuarioId: respostaApi.usuarioId,
       });
 
       navigate("/home");
@@ -54,7 +50,10 @@ export default function Login() {
       <main className="flex-1 flex bg-linear-to-br from-primary-light via-primary to-primary-accent items-center justify-center">
         <form
           className="p-10 rounded w-100 bg-white shadow-md flex flex-col gap-4"
-          onSubmit={handleLogin}
+            onSubmit={(e) => {
+            e.preventDefault();
+            handleLogin();
+          }}
         >
           <div className="flex justify-between items-center">
             <h1 className="text-xl font-semibold">Entrar</h1>
@@ -67,10 +66,11 @@ export default function Login() {
           )}
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-700">
+              <label htmlFor="usuario-input" className="text-sm font-medium text-gray-700">
                 Nome de usuário
               </label>
               <input
+                id="usuario-input"
                 className="w-full rounded border p-2 focus:outline-primary"
                 type="text"
                 value={usuario}
@@ -80,8 +80,11 @@ export default function Login() {
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-700">Senha</label>
+              <label htmlFor="senha-input" className="text-sm font-medium text-gray-700">
+                Senha
+              </label>
               <input
+                id="senha-input"
                 className="w-full rounded border p-2 focus:outline-primary"
                 type="password"
                 value={senha}
