@@ -1,24 +1,27 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type {
   GrupoInterface,
-  ParticipanteInterface,
   MembroInterface,
-  ModalType,
 } from "../types/type";
-import Modal from "./modals/modal";
-import { modalTitles, obterComponenteModal } from "./modals/modalConfig";
+import { isMembroDoGrupo, isAdminDoGrupo } from "../utils/grupoUtils";
 import Participantes from "./participantes";
 import Grupos from "./grupos";
+import AdicionarGrupo from "./modals/AdicionarGrupo";
+import EditarGrupo from "./modals/EditarGrupo";
+import RemoverGrupo from "./modals/RemoverGrupo";
+import CompartilharConvite from "./modals/CompartilharConvite";
+import { useParticipanteAtual } from "../hooks/useParticipanteAtual";
+import { grupoService } from "../services/grupoService";
+import { ModalWrapper, type ModalType } from "./modals/ModalWrapper";
 
 interface GrupoProp {
   grupo: GrupoInterface;
-  todosGrupos: GrupoInterface[];
-  todosParticipantes: ParticipanteInterface[];
   membros: MembroInterface[];
-  onAdicionarSubgrupo: (parentId: number) => void;
-  onAdicionarParticipante: (grupoId: number) => void;
+  todosGrupos: GrupoInterface[];
+  todosMembros: MembroInterface[];
   maxSubgrupos?: number;
   maxParticipantes?: number;
+  onDadosChange?: () => void;
 }
 
 type Secao = "membros" | "grupos" | null;
@@ -26,10 +29,7 @@ type Secao = "membros" | "grupos" | null;
 function Painel({
   aberto,
   children,
-}: {
-  aberto: boolean;
-  children: React.ReactNode;
-}) {
+}: Readonly<{ aberto: boolean; children: ReactNode }>) {
   return (
     <div
       className={`grid transition-all duration-300 ease-in-out ${
@@ -46,41 +46,44 @@ function Painel({
 export default function Grupo({
   grupo,
   todosGrupos,
-  todosParticipantes,
+  todosMembros,
   membros,
-  onAdicionarSubgrupo,
-  onAdicionarParticipante,
-  maxSubgrupos = 100,
   maxParticipantes = 10,
-}: GrupoProp) {
+  onDadosChange,
+}: Readonly<GrupoProp>) {
+  const { participanteAtual } = useParticipanteAtual();
+  const euId = participanteAtual?.id;
+
+  const [codigoConvite, setCodigoConvite] = useState<string | null>(null);
   const [modalType, setModalType] = useState<ModalType>(null);
-  const modalEstaAberto = modalType !== null;
-  const abrirModal = (tipo: Exclude<ModalType, null>) => setModalType(tipo);
   const fecharModal = () => setModalType(null);
 
-  const ehRaiz = grupo.parentId === null;
+  const ehRaiz = grupo.grupoPaiId === null;
+  const souAdmin = isAdminDoGrupo(euId!, grupo.id, membros);
+  const souMembro = isMembroDoGrupo(euId!, grupo.id, membros);
 
   const [secaoAberta, setSecaoAberta] = useState<Secao>("membros");
   const alternarSecao = (secao: Exclude<Secao, null>) =>
     setSecaoAberta((atual) => (atual === secao ? null : secao));
 
-  const filhos = todosGrupos.filter((g) => g.parentId === grupo.id);
+  const filhos = todosGrupos.filter((g) => g.grupoPaiId === grupo.id);
+  
+  // Agora filtramos os membros diretamente pelo grupoId recebido do DTO
   const membrosDoGrupo = membros.filter((m) => m.grupoId === grupo.id);
-  const participantesDoGrupo = todosParticipantes.filter((p) =>
-    membrosDoGrupo.some((m) => m.participanteId === p.id),
-  );
 
-  const idsFilhos = new Set(filhos.map((f) => f.id));
+  const filhosIds = new Set(filhos.map((f) => f.id));
   const membrosComSubgrupo = ehRaiz
-    ? membros.filter((m) => idsFilhos.has(m.grupoId))
+    ? membros.filter((m) => filhosIds.has(m.grupoId))
     : [];
 
-  function handleAdicionarSubgrupo() {
-    if (filhos.length >= maxSubgrupos) {
-      alert("Limite de subgrupos atingido!");
-      return;
+  async function handleAbrirConvite() {
+    try {
+      const codigo = await grupoService.obterConvite(grupo.id);
+      setCodigoConvite(codigo);
+      setModalType("compartilharConvite");
+    } catch {
+      alert("Erro ao gerar código de convite");
     }
-    onAdicionarSubgrupo(grupo.id);
   }
 
   return (
@@ -93,6 +96,31 @@ export default function Grupo({
         }`}
       >
         <span className="flex-1 truncate">{grupo.nome}</span>
+
+        {souAdmin && (
+          <>
+            <button
+              onClick={() => setModalType("editarGrupo")}
+              className="w-5 h-5 flex items-center justify-center rounded text-xs hover:bg-primary cursor-pointer"
+            >
+              Editar
+            </button>
+            <button
+              onClick={() => setModalType("removerGrupo")}
+              className="w-5 h-5 flex items-center justify-center rounded text-xs hover:bg-primary cursor-pointer"
+            >
+              Deletar
+            </button>
+            {ehRaiz && (
+              <button
+                onClick={handleAbrirConvite}
+                className="w-5 h-5 flex items-center justify-center rounded text-xs hover:bg-primary cursor-pointer"
+              >
+                Convidar
+              </button>
+            )}
+          </>
+        )}
 
         <button
           onClick={() => alternarSecao("membros")}
@@ -135,37 +163,43 @@ export default function Grupo({
 
       <Painel aberto={secaoAberta === "membros"}>
         <Participantes
-          participantes={participantesDoGrupo}
+          grupoId={grupo.id}
+          grupoPaiId={grupo.grupoPaiId}
+          membros={membrosDoGrupo}
+          todosMembros={todosMembros}
           membrosComSubgrupo={membrosComSubgrupo}
           mostrarFiltro={ehRaiz}
-          onAdicionar={() => onAdicionarParticipante(grupo.id)}
+          maxParticipantes={maxParticipantes}
+          onMembrosChange={onDadosChange}
         />
       </Painel>
 
       {ehRaiz && (
         <Painel aberto={secaoAberta === "grupos"}>
           <Grupos
+            grupoPai={grupo.id}
             grupos={filhos}
             todosGrupos={todosGrupos}
-            todosParticipantes={todosParticipantes}
+            todosMembros={todosMembros}
             membros={membros}
-            onAdicionarSubgrupo={onAdicionarSubgrupo}
-            onAdicionarParticipante={onAdicionarParticipante}
-            onAbrirModalAdicionar={() => abrirModal("subgrupo")}
           />
         </Painel>
       )}
 
-      <Modal
-        isOpen={modalEstaAberto}
-        title={modalType ? modalTitles[modalType] : ""}
-        onClose={fecharModal}
-      >
-        {obterComponenteModal(modalType, {
-          onClose: fecharModal,
-          onAdicionarSubgrupo: handleAdicionarSubgrupo,
-        })}
-      </Modal>
+      <ModalWrapper tipo={modalType} onClose={fecharModal}>
+        {modalType === "adicionarGrupo" && (
+          <AdicionarGrupo grupoPaiId={grupo.id} onClose={fecharModal} />
+        )}
+        {modalType === "editarGrupo" && (
+          <EditarGrupo grupo={grupo} onClose={fecharModal} />
+        )}
+        {modalType === "removerGrupo" && (
+          <RemoverGrupo grupo={grupo} onClose={fecharModal} isOpen />
+        )}
+        {modalType === "compartilharConvite" && (
+          <CompartilharConvite codigoConvite={codigoConvite} />
+        )}
+      </ModalWrapper>
     </div>
   );
 }
